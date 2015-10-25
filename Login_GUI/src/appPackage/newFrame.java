@@ -8,9 +8,9 @@ public class newFrame extends JFrame {
 
 	private JButton logOut;
 
-	public static void main(String[] args) {
-		newFrame frameLabel = new newFrame();
-	}
+//	public static void main(String[] args) {
+//		newFrame frameLabel = new newFrame();
+//	}
 
 	JLabel welcome = new JLabel("Welcome to a New Frame");
 

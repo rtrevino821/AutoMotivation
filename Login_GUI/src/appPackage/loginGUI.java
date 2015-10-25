@@ -62,14 +62,14 @@ public class loginGUI extends JFrame {
 		setContentPane(new JLabel(new ImageIcon("src/Login-Screen-BG.jpg")));
 	    getContentPane().setLayout(null);
 	    
-	    userNameLabel = new JTextField("User Name");
+	    userNameLabel = new JTextField("sjoy");
 	    userNameLabel.setOpaque(false);
 	    userNameLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 	    userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	    userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
 	    userNameLabel.setBounds(new Rectangle(508, 376, 442, 65));
 	    
-	    passwordLabel = new JPasswordField("Password");
+	    passwordLabel = new JPasswordField("test123");
 	    passwordLabel.setOpaque(false);
 	    passwordLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 	    passwordLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -126,8 +126,8 @@ public class loginGUI extends JFrame {
 						
 					}
 					if (count == 1){
-						newFrame regFace = new newFrame();
-						regFace.setVisible(true);
+						mainDashboard regFace = new mainDashboard();
+						//regFace.setVisible(true);
 						dispose();
 					}else if (count == 2){
 						JOptionPane.showMessageDialog(null,"Duplicate Username and Password");
