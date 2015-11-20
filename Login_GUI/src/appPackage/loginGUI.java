@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.IOException;
+import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,6 +28,7 @@ import java.awt.Font;
 public class loginGUI extends JFrame {
 
 	private final JTextField userNameLabel;
+	private final JTextField clicker;
 	private final JPasswordField passwordLabel;
 	private JButton blogin;
 
@@ -62,14 +65,47 @@ public class loginGUI extends JFrame {
 		setContentPane(new JLabel(new ImageIcon("src/Login-Screen-BG.jpg")));
 	    getContentPane().setLayout(null);
 	    
-	    userNameLabel = new JTextField("sjoy");
+	 // Icon Image
+	    ImageIcon icon = new ImageIcon("src/appIconImage.png");
+	    setIconImage(icon.getImage());
+
+	    clicker = new JTextField("");
+	    add(clicker);
+	    
+		userNameLabel = new JTextField("User Name");
+		userNameLabel.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				userNameLabel.setText("");
+			}
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (userNameLabel.getText().trim().isEmpty()) {
+					userNameLabel.setText("User Name");
+				}
+			}
+		});
 	    userNameLabel.setOpaque(false);
 	    userNameLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 	    userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	    userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
 	    userNameLabel.setBounds(new Rectangle(508, 376, 442, 65));
 	    
-	    passwordLabel = new JPasswordField("test123");
+	    passwordLabel = new JPasswordField("Password");
+	    passwordLabel.addFocusListener(new FocusListener() {
+	        @Override
+	        public void focusGained(FocusEvent e) {
+	          passwordLabel.setText("");
+	        }
+
+	        @Override
+	        public void focusLost(FocusEvent arg0) {
+	          if (passwordLabel.getPassword().length == 0) {
+	            passwordLabel.setText("password");
+	          }
+	        }
+	      });
 	    passwordLabel.setOpaque(false);
 	    passwordLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 	    passwordLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -77,6 +113,7 @@ public class loginGUI extends JFrame {
 	    passwordLabel.setBounds(new Rectangle(508, 476, 442, 65));
 	    
 	    blogin = new JButton("Login");
+	    blogin.setFont(new Font("Tahoma", Font.BOLD, 18));
 	    blogin.setBounds(new Rectangle(508, 576, 442, 65));
 	    
 	    add(userNameLabel);
@@ -143,4 +180,5 @@ public class loginGUI extends JFrame {
 			}
 		});
 	}
+
 }
