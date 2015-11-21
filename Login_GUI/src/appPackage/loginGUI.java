@@ -70,7 +70,7 @@ public class loginGUI extends JFrame {
 	    setIconImage(icon.getImage());
 
 	    clicker = new JTextField("");
-	    add(clicker);
+	    getContentPane().add(clicker);
 	    
 		userNameLabel = new JTextField("User Name");
 		userNameLabel.addFocusListener(new FocusListener() {
@@ -114,11 +114,11 @@ public class loginGUI extends JFrame {
 	    
 	    blogin = new JButton("Login");
 	    blogin.setFont(new Font("Tahoma", Font.BOLD, 18));
-	    blogin.setBounds(new Rectangle(508, 576, 442, 65));
+	    blogin.setBounds(new Rectangle(550, 578, 350, 65));
 	    
-	    add(userNameLabel);
-	    add(passwordLabel);
-	    add(blogin);
+	    getContentPane().add(userNameLabel);
+	    getContentPane().add(passwordLabel);
+	    getContentPane().add(blogin);
 
 	    actionlogin();
 	    connection = sqliteConnection.dbConnector();

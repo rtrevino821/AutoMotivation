@@ -12,6 +12,8 @@ import javax.swing.*;
 import net.proteanit.sql.DbUtils;
 
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ActionEvent;
 
 public class mainDashboard {
@@ -19,8 +21,10 @@ public class mainDashboard {
 	private JFrame frame;
 	private JTextField userNameLabel;
 	private JPasswordField passwordLabel;
+	private JButton blogin;
 
-	Connection conn = null;
+	Connection connection = null;
+	
 	private JTable allProductsTable;
 	private JTable enginePartsTable;
 	private JTable alternatorsTable;
@@ -30,9 +34,10 @@ public class mainDashboard {
 	private JTable productListTable;
 	/**
 	 * Create the application.
+	 * 
 	 */
 	public mainDashboard() {
-		conn = sqliteConnection.dbConnector();
+		connection = sqliteConnection.dbConnector();
 		initialize();
 	}
 
@@ -140,7 +145,7 @@ public class mainDashboard {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
 					String queryAllProducts = "select Name, price, inStock from InventoryList";
-					PreparedStatement pstAllProducts = conn.prepareStatement(queryAllProducts);					
+					PreparedStatement pstAllProducts = connection.prepareStatement(queryAllProducts);					
 					ResultSet rsAllProducts = pstAllProducts.executeQuery();
 					
 					productListTable.setModel(DbUtils.resultSetToTableModel(rsAllProducts));
@@ -236,7 +241,7 @@ public class mainDashboard {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
 					String queryAllProducts = "select * from InventoryList";
-					PreparedStatement pstAllProducts = conn.prepareStatement(queryAllProducts);					
+					PreparedStatement pstAllProducts = connection.prepareStatement(queryAllProducts);					
 					ResultSet rsAllProducts = pstAllProducts.executeQuery();
 					
 					allProductsTable.setModel(DbUtils.resultSetToTableModel(rsAllProducts));
@@ -245,7 +250,7 @@ public class mainDashboard {
 					pstAllProducts.close();
 					
 					String queryEngineParts = "select * from InventoryList where Category = ?";
-					PreparedStatement pstEngineParts = conn.prepareStatement(queryEngineParts);
+					PreparedStatement pstEngineParts = connection.prepareStatement(queryEngineParts);
 					pstEngineParts.setString(1, "Engine Parts" );
 					ResultSet rsEngineParts = pstEngineParts.executeQuery();
 					
@@ -255,7 +260,7 @@ public class mainDashboard {
 					pstEngineParts.close();
 					
 					String queryAlternators = "select * from InventoryList where Category = ?";
-					PreparedStatement pstAlternators = conn.prepareStatement(queryAlternators);
+					PreparedStatement pstAlternators = connection.prepareStatement(queryAlternators);
 					pstAlternators.setString(1, "Alternators" );
 					ResultSet rsAlternators = pstAlternators.executeQuery();
 					
@@ -265,7 +270,7 @@ public class mainDashboard {
 					pstAlternators.close();
 					
 					String queryFilters = "select * from InventoryList where Category = ?";
-					PreparedStatement pstFilters = conn.prepareStatement(queryFilters);
+					PreparedStatement pstFilters = connection.prepareStatement(queryFilters);
 					pstFilters.setString(1, "Filters" );
 					ResultSet rsFilters = pstFilters.executeQuery();
 					
@@ -275,7 +280,7 @@ public class mainDashboard {
 					pstFilters.close();
 					
 					String queryTires = "select * from InventoryList where Category = ?";
-					PreparedStatement pstTires = conn.prepareStatement(queryTires);
+					PreparedStatement pstTires = connection.prepareStatement(queryTires);
 					pstTires.setString(1, "Tires" );
 					ResultSet rsTires = pstTires.executeQuery();
 					
@@ -298,20 +303,51 @@ public class mainDashboard {
 		managerPanel.setLayout(null);
 		
 		userNameLabel = new JTextField("Username");
+		userNameLabel.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				userNameLabel.setText("");
+			}
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				if (userNameLabel.getText().trim().isEmpty()) {
+					userNameLabel.setText("User Name");
+				}
+			}
+		});		
 		userNameLabel.setOpaque(false);
 		userNameLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
-		userNameLabel.setBounds(new Rectangle(475, 93, 442, 65));
+		userNameLabel.setBounds(new Rectangle(468, 93, 442, 65));
 		managerPanel.add(userNameLabel);
 		
 		passwordLabel = new JPasswordField("Password");
+		passwordLabel.addFocusListener(new FocusListener() {
+	        @Override
+	        public void focusGained(FocusEvent e) {
+	          passwordLabel.setText("");
+	        }
+
+	        @Override
+	        public void focusLost(FocusEvent arg0) {
+	          if (passwordLabel.getPassword().length == 0) {
+	            passwordLabel.setText("password");
+	          }
+	        }
+	      });
 	    passwordLabel.setOpaque(false);
 	    passwordLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 	    passwordLabel.setHorizontalAlignment(SwingConstants.CENTER);
 	    passwordLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
-	    passwordLabel.setBounds(new Rectangle(475, 174, 442, 65));
+	    passwordLabel.setBounds(new Rectangle(468, 174, 442, 65));
 	    managerPanel.add(passwordLabel);
+	    
+	    blogin = new JButton("Login");
+	    blogin.setFont(new Font("Tahoma", Font.BOLD, 18));
+	    blogin.setBounds(new Rectangle(589, 255, 200, 45));
+	    managerPanel.add(blogin);
 		
 		JLabel lblNewLabel = new JLabel("Manager Login");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
@@ -323,9 +359,48 @@ public class mainDashboard {
 		label_1.setBounds(0, 0, 1383, 492);
 		managerPanel.add(label_1);
 		
+	    actionlogin();
+	    connection = sqliteConnection.dbConnector();
+		
 		
 //		JPanel panel_4 = new JPanel();
 //		tabbedPane.addTab("New tab", null, panel_4, null);
 //		panel_4.setLayout(null);
 	}
+	
+	public void actionlogin() {
+		blogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				try{
+					String query="select * from Managers where username = ? and password = ?";
+					PreparedStatement pst = connection.prepareStatement(query);
+					pst.setString(1, userNameLabel.getText() );
+					pst.setString(2, passwordLabel.getText() );
+					
+					ResultSet rs = pst.executeQuery();
+					int count = 0;
+					while (rs.next()){
+						
+						count++;
+						
+					}
+					if (count == 1){
+						managerFrame manFrame = new managerFrame();
+						//regFace.setVisible(true);
+						//dispose();
+					}else if (count == 2){
+						JOptionPane.showMessageDialog(null,"Duplicate Username and Password");
+					} else{
+						JOptionPane.showMessageDialog(null,"Username and/or Password is not correct!");
+					}
+					
+					rs.close();
+					pst.close();
+				}catch (Exception e){
+					JOptionPane.showMessageDialog(null, e);
+				}
+			}
+		});
+	}
+	
 }

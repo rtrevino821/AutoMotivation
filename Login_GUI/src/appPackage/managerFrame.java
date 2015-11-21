@@ -4,13 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class newFrame extends JFrame {
+public class managerFrame extends JFrame {
 
 	private JButton logOut;
 
 	JLabel welcome = new JLabel("Welcome to a New Frame");
 
-	newFrame() {
+	managerFrame() {
 		super("Welcome");
 		setResizable(false);
 		setSize(1440, 810);
