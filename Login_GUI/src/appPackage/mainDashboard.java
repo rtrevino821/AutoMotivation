@@ -4,16 +4,21 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.sql.*;
+import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 import net.proteanit.sql.DbUtils;
 
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.print.PrinterException;
 import java.awt.event.ActionEvent;
 
 public class mainDashboard {
@@ -30,8 +35,14 @@ public class mainDashboard {
 	private JTable alternatorsTable;
 	private JTable filtersTable;
 	private JTable tiresTable;
-	private JTable table;
+	private JTable checkoutTable;
 	private JTable productListTable;
+	private JTextField textField_subTotal;
+	private JTextField textField_tax;
+	private JTextField textField_total;
+	private DefaultTableModel model;
+	private Object[] row;
+	private double total;
 	/**
 	 * Create the application.
 	 * 
@@ -70,6 +81,8 @@ public class mainDashboard {
 		mainTabbedPane.setFont(new Font("Tahoma", Font.BOLD, 16));
 		frame.getContentPane().add(mainTabbedPane);
 		
+		//////////////////////////MAIN DASH TAB ///////////////////////////////
+		
 		JPanel mainDashTab = new JPanel();
 		mainTabbedPane.addTab("Main Dashboard", homeIcon, mainDashTab, "Go to Home Screen");
 		mainDashTab.setLayout(null);
@@ -79,43 +92,75 @@ public class mainDashboard {
 		mainDashTab.add(label);
 		label.setIcon(new ImageIcon("src/mainDashTabBGFinal.jpg"));
 		
+		////////////////////////// CHECKOUT TAB ///////////////////////////////
+		
 		JPanel checkoutTab = new JPanel();
-		mainTabbedPane.addTab("Checkout", checkIcon, checkoutTab, null);
+		mainTabbedPane.addTab("Checkout", checkIcon, checkoutTab, "Checkout Customer");
 		checkoutTab.setLayout(null);
 		
 		JScrollPane scrollPane_5 = new JScrollPane();
 		scrollPane_5.setBounds(776, 74, 592, 377);
 		checkoutTab.add(scrollPane_5);
 		
-		table = new JTable();
-		scrollPane_5.setViewportView(table);
+		checkoutTable = new JTable();
+		checkoutTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 18));
+		checkoutTable.setFont(new Font("Tahoma", Font.BOLD, 16));
+		checkoutTable.setRowHeight(checkoutTable.getRowHeight()+ 10);
+		scrollPane_5.setViewportView(checkoutTable);
 		
+		Object[] columns = {"Product Name","Price"};
+        model = new DefaultTableModel();
+        model.setColumnIdentifiers(columns);
+        
+        // set the model to the table
+        checkoutTable.setModel(model);
+        
+        // create an array of objects to set the row data
+        row = new Object[2];
+		
+        Font labelFont = new Font("Tahoma", Font.BOLD, 18);
+        
 		JLabel lblOrderSummary = new JLabel("Order Summary");
-		lblOrderSummary.setFont(new Font("Tahoma", Font.BOLD, 18));
+		lblOrderSummary.setFont(labelFont);
 		lblOrderSummary.setBounds(776, 16, 189, 39);
 		checkoutTab.add(lblOrderSummary);
 		
 		JLabel lblProductList = new JLabel("Product List");
-		lblProductList.setFont(new Font("Tahoma", Font.BOLD, 18));
+		lblProductList.setFont(labelFont);
 		lblProductList.setBounds(39, 16, 189, 39);
 		checkoutTab.add(lblProductList);
 		
+		Font textFieldFont = new Font("Tahoma", Font.BOLD, 20);
+		
 		JLabel lblTotal = new JLabel("Total:");
-		lblTotal.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblTotal.setFont(textFieldFont);
 		lblTotal.setBounds(39, 442, 69, 20);
 		checkoutTab.add(lblTotal);
 		
 		JLabel lblTax = new JLabel("Tax:");
-		lblTax.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblTax.setFont(textFieldFont);
 		lblTax.setBounds(39, 406, 69, 20);
 		checkoutTab.add(lblTax);
 		
+		
 		JLabel lblSubTotal = new JLabel("Sub Total:");
-		lblSubTotal.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblSubTotal.setFont(textFieldFont);
 		lblSubTotal.setBounds(39, 371, 102, 20);
 		checkoutTab.add(lblSubTotal);
 		
 		JButton btnNewButton = new JButton("Print Order");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MessageFormat footer = new MessageFormat("Total: $" + total);
+				try {
+					
+					checkoutTable.print(JTable.PrintMode.FIT_WIDTH, null, footer);
+				} catch (PrinterException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 18));
 		btnNewButton.setBounds(1219, 16, 149, 29);
 		checkoutTab.add(btnNewButton);
@@ -125,16 +170,33 @@ public class mainDashboard {
 		checkoutTab.add(scrollPane_6);
 		
 		productListTable = new JTable();
+		productListTable.getTableHeader().setFont(new Font("Tahoma", Font.BOLD, 18));
 		productListTable.setFont(new Font("Tahoma", Font.BOLD, 16));
 		productListTable.setRowHeight(productListTable.getRowHeight()+ 10);
 		scrollPane_6.setViewportView(productListTable);
 		
 		JButton btnAddItem = new JButton("Add Item");
+		btnAddItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				addItem();
+                updateCheckout();
+
+			}
+		});
+		
 		btnAddItem.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnAddItem.setBounds(608, 167, 130, 29);
 		checkoutTab.add(btnAddItem);
 		
 		JButton btnRemoveItem = new JButton("Remove Item");
+		btnRemoveItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				removeItem();				
+                updateCheckout();
+                
+			}
+		});
 		btnRemoveItem.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnRemoveItem.setBounds(608, 228, 130, 29);
 		checkoutTab.add(btnRemoveItem);
@@ -162,8 +224,32 @@ public class mainDashboard {
 		btnLoadProducts.setBounds(404, 16, 175, 42);
 		checkoutTab.add(btnLoadProducts);
 		
+		textField_subTotal = new JTextField();
+		textField_subTotal.setFont(new Font("Tahoma", Font.BOLD, 18));
+		textField_subTotal.setEditable(false);
+		textField_subTotal.setBounds(162, 370, 146, 26);
+		checkoutTab.add(textField_subTotal);
+		textField_subTotal.setColumns(10);
+		
+		textField_tax = new JTextField();
+		textField_tax.setFont(new Font("Tahoma", Font.BOLD, 18));
+		textField_tax.setEditable(false);
+		textField_tax.setBounds(162, 405, 146, 26);
+		checkoutTab.add(textField_tax);
+		textField_tax.setColumns(10);
+		
+		textField_total = new JTextField();
+		textField_total.setFont(new Font("Tahoma", Font.BOLD, 20));
+		textField_total.setEditable(false);
+		textField_total.setBounds(162, 441, 146, 26);
+		checkoutTab.add(textField_total);
+		textField_total.setColumns(10);
+
+		
+		////////////////////////// INVENTORY TAB ///////////////////////////////
+		
 		JPanel inventoryTab = new JPanel();
-		mainTabbedPane.addTab("Inventory", inventoryIcon, inventoryTab, null);
+		mainTabbedPane.addTab("Inventory", inventoryIcon, inventoryTab, "Look up parts, price, & inventory");
 		inventoryTab.setLayout(null);
 		
 		JTabbedPane inventorySubPane = new JTabbedPane(JTabbedPane.TOP);
@@ -298,8 +384,10 @@ public class mainDashboard {
 		btnLoadInventory.setBounds(15, 1, 194, 38);
 		inventoryTab.add(btnLoadInventory);
 		
+		///////////////////////MANAGER TAB ///////////////////////////////
+		
 		JPanel managerPanel = new JPanel();
-		mainTabbedPane.addTab("Manager", managerIcon, managerPanel, null);
+		mainTabbedPane.addTab("Manager Login", managerIcon, managerPanel, "Manager Login");
 		managerPanel.setLayout(null);
 		
 		userNameLabel = new JTextField("Username");
@@ -368,6 +456,68 @@ public class mainDashboard {
 //		panel_4.setLayout(null);
 	}
 	
+	public void incrementStock(String productName){
+		for(int i = 0; i < productListTable.getRowCount(); i++){//For each row
+	            if(productListTable.getValueAt(i, 0).equals(productName)){
+	        		int tempStock = (int)productListTable.getValueAt(i, 2);
+	        		tempStock++;
+	        		productListTable.setValueAt(tempStock, i, 2);
+	            }
+		}
+	}
+	
+	public void decrementStock(){
+		int i = productListTable.getSelectedRow();
+		int tempStock = (int)productListTable.getValueAt(i, 2);
+		tempStock--;
+		productListTable.setValueAt(tempStock, i, 2);
+	}
+	
+	public void addItem(){
+		int i = productListTable.getSelectedRow();
+		
+		if((int)productListTable.getValueAt(i, 2) > 0){
+			row[0] = productListTable.getValueAt(i, 0);
+	        row[1] = productListTable.getValueAt(i, 1);
+	        
+	        //add row to the model
+	        model.addRow(row);
+	        decrementStock();
+		}else{
+			JOptionPane.showMessageDialog(null, "No more in stock!");;
+		}
+	}
+	
+	public void removeItem(){
+		// i = the index of the selected row
+        int i = checkoutTable.getSelectedRow();
+        String productName = model.getValueAt(i, 0).toString();
+        incrementStock(productName);
+        if(i >= 0){
+            // remove a row from JTable
+            model.removeRow(i);
+        }
+        else{
+            System.out.println("Delete Error");
+        }
+	}
+	
+	public void updateCheckout(){
+		double subTotal = 0;        
+        
+        for (int rowIndex = 0; rowIndex < model.getRowCount(); rowIndex++){
+        	subTotal += ((Double)model.getValueAt(rowIndex, 1));
+        }
+        
+        double tax = subTotal * 0.06;
+        
+        total = subTotal + tax;
+        
+        textField_subTotal.setText("$" + Double.toString(subTotal));
+        textField_tax.setText("$" + Double.toString(tax));
+        textField_total.setText("$" + Double.toString(total));
+	}
+	
 	public void actionlogin() {
 		blogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -402,5 +552,4 @@ public class mainDashboard {
 			}
 		});
 	}
-	
 }
