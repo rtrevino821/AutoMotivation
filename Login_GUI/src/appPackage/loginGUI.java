@@ -1,184 +1,275 @@
 package appPackage;
 
-import java.awt.BorderLayout;
+//EventQueue is a platform-independent class that queues events
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
+// Used to create the areas for most of the tabs, buttons, and frames
 import java.awt.Rectangle;
+// Used to find when actions occur during the program
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.io.IOException;
-import java.net.SocketException;
+// Used to communicate with the SQLite database
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+// Used to change the icon from the default Java
 import javax.swing.ImageIcon;
+// Used to create button in the program
 import javax.swing.JButton;
+// The whole program is ran on a JFrame
 import javax.swing.JFrame;
+// Used to label certian areas for better readability
 import javax.swing.JLabel;
+// Used to throw error messages
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+// Used to create a secure login area
 import javax.swing.JPasswordField;
+// Used to enter the User name
 import javax.swing.JTextField;
+// Used for positioning and orienting components on the screen
 import javax.swing.SwingConstants;
+
+//Used to create fonts for the displayed texts
 import java.awt.Font;
+// Used to change the color of buttons
+import java.awt.Color;
 
 public class loginGUI extends JFrame {
 
-	private final JTextField userNameLabel;
-	private final JTextField clicker;
-	private final JPasswordField passwordLabel;
-	private JButton blogin;
+  // Declaration of the Username textField
+  private static JTextField userNameLabel;
+  // clicker is used so when the program is first opened the Username textField
+  // isnt already clicked
+  private final JTextField clicker;
+  // Declaration of the password field
+  private final JPasswordField passwordLabel;
+  // Declaration of the button used to login
+  private JButton blogin;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					loginGUI frame = new loginGUI();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
-	Connection connection = null;
-	/**
-	 * Create the frame.
-	 */
-	public loginGUI() {
-		setTitle("Login");
-		setResizable(false);
-		setSize(1440,810);
-		setLocationRelativeTo(null); //center JFrame on screen
-		setUndecorated(false); //removes frame around window
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setVisible(true);
-        
-		//background image
-		setContentPane(new JLabel(new ImageIcon("src/Login-Screen-BG.jpg")));
-	    getContentPane().setLayout(null);
-	    
-	 // Icon Image
-	    ImageIcon icon = new ImageIcon("src/appIconImage.png");
-	    setIconImage(icon.getImage());
+  /**
+   * Launch the application.
+   */
+  // Main for the program
+  public static void main(String[] args) {
 
-	    clicker = new JTextField("");
-	    getContentPane().add(clicker);
-	    
-		userNameLabel = new JTextField("User Name");
-		userNameLabel.addFocusListener(new FocusListener() {
-			@Override
-			public void focusGained(FocusEvent e) {
-				userNameLabel.setText("");
-			}
+    EventQueue.invokeLater(new Runnable() {
+      // run() is used to initialize the program
+      public void run() {
+        try {
 
-			@Override
-			public void focusLost(FocusEvent arg0) {
-				if (userNameLabel.getText().trim().isEmpty()) {
-					userNameLabel.setText("User Name");
-				}
-			}
-		});
-	    userNameLabel.setOpaque(false);
-	    userNameLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-	    userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-	    userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
-	    userNameLabel.setBounds(new Rectangle(508, 376, 442, 65));
-	    
-	    passwordLabel = new JPasswordField("Password");
-	    passwordLabel.addFocusListener(new FocusListener() {
-	        @Override
-	        public void focusGained(FocusEvent e) {
-	          passwordLabel.setText("");
-	        }
+          loginGUI frame = new loginGUI();
+          frame.setVisible(true);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    });
+  }
 
-	        @Override
-	        public void focusLost(FocusEvent arg0) {
-	          if (passwordLabel.getPassword().length == 0) {
-	            passwordLabel.setText("password");
-	          }
-	        }
-	      });
-	    passwordLabel.setOpaque(false);
-	    passwordLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-	    passwordLabel.setHorizontalAlignment(SwingConstants.CENTER);
-	    passwordLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
-	    passwordLabel.setBounds(new Rectangle(508, 476, 442, 65));
-	    
-	    blogin = new JButton("Login");
-	    blogin.setFont(new Font("Tahoma", Font.BOLD, 18));
-	    blogin.setBounds(new Rectangle(550, 578, 350, 65));
-	    
-	    getContentPane().add(userNameLabel);
-	    getContentPane().add(passwordLabel);
-	    getContentPane().add(blogin);
+  Connection connection = null;
 
-	    actionlogin();
-	    connection = sqliteConnection.dbConnector();
-	}
+  /**
+   * Create the frame.
+   */
+  public loginGUI() {
+    // Titles the JFrame as the "Login"
+    setTitle("Login");
+    // The user can't resize the JFrame
+    setResizable(false);
+    // Sets the static size of the frame
+    setSize(1440, 810);
+    // center JFrame on screen
+    setLocationRelativeTo(null);
+    // removes frame around window
+    setUndecorated(false);
+    // Gives the default close option
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    // Makes the Frame Viewable
+    setVisible(true);
 
-//	public void actionlogin() {
-//		blogin.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent ae) {
-//				String puname = userNameLabel.getText();
-//				@SuppressWarnings("deprecation")
-//				String ppaswd = passwordLabel.getText();
-//				if (puname.equals("test") && ppaswd.equals("12345")) {
-//					newFrame regFace = new newFrame();
-//					regFace.setVisible(true);
-//					dispose();
-//				} else {
-//
-//					JOptionPane.showMessageDialog(null, "Wrong Password / Username");
-//					userNameLabel.setText("");
-//					passwordLabel.setText("");
-//					userNameLabel.requestFocus();
-//				}
-//
-//			}
-//		});
-//	}
-	
-	public void actionlogin() {
-		blogin.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				try{
-					String query="select * from UsernameInfo where username = ? and password = ?";
-					PreparedStatement pst = connection.prepareStatement(query);
-					pst.setString(1, userNameLabel.getText() );
-					pst.setString(2, passwordLabel.getText() );
-					
-					ResultSet rs = pst.executeQuery();
-					int count = 0;
-					while (rs.next()){
-						
-						count++;
-						
-					}
-					if (count == 1){
-						mainDashboard regFace = new mainDashboard();
-						//regFace.setVisible(true);
-						dispose();
-					}else if (count == 2){
-						JOptionPane.showMessageDialog(null,"Duplicate Username and Password");
-					} else{
-						JOptionPane.showMessageDialog(null,"Username and/or Password is not correct!");
-					}
-					
-					rs.close();
-					pst.close();
-				}catch (Exception e){
-					JOptionPane.showMessageDialog(null, e);
-				}
-			}
-		});
-	}
+    // background image
+    setContentPane(new JLabel(new ImageIcon("src/Login-Screen-BG.jpg")));
+    getContentPane().setLayout(null);
+
+    // Icon Image
+    ImageIcon icon = new ImageIcon("src/appIconImage.png");
+    setIconImage(icon.getImage());
+    // Used to hide cursor when first opened
+    clicker = new JTextField("");
+    getContentPane().add(clicker);
+    // Displays "User Name" in the TextField
+    userNameLabel = new JTextField("User Name");
+    // When the username textfield is clicked it will become blank for the user
+    // to type and when clicked away while empty it will display "User name"
+    userNameLabel.addFocusListener(new FocusListener() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        userNameLabel.setText("");
+      }
+
+      @Override
+      public void focusLost(FocusEvent arg0) {
+        if (userNameLabel.getText().trim().isEmpty()) {
+          userNameLabel.setText("User Name");
+        }
+      }
+    });
+    // The label is not set as Opaque meaning the component may not paint some
+    // or all of its pixels, allowing the underlying pixels to show through.
+    userNameLabel.setOpaque(false);
+    // Creates an empty border that gives no space
+    userNameLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+    // Centers the Label
+    userNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    // Sets font
+    userNameLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
+    // Positions the label
+    userNameLabel.setBounds(new Rectangle(508, 376, 442, 65));
+    // Displays "Password" in the pawwordField
+    passwordLabel = new JPasswordField("Password");
+    // When the password textfield is clicked it will become blank for the user
+    // to type and when clicked away while empty it will display "Password"
+    passwordLabel.addFocusListener(new FocusListener() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        passwordLabel.setText("");
+      }
+
+      @Override
+      public void focusLost(FocusEvent arg0) {
+        if (passwordLabel.getPassword().length == 0) {
+          passwordLabel.setText("password");
+        }
+      }
+    });
+    // The label is not set as Opaque meaning the component may not paint some
+    // or all of its pixels, allowing the underlying pixels to show through.
+    passwordLabel.setOpaque(false);
+    // Creates an empty border that gives no space
+    passwordLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+    // Center the field horizontaly
+    passwordLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    // Sets the font of the textfield
+    passwordLabel.setFont(new Font("Tahoma", Font.BOLD, 18));
+    // Set the bounds of the etxtField
+    passwordLabel.setBounds(new Rectangle(508, 476, 442, 65));
+    // Displays "Login" on the JButton
+    blogin = new JButton("Login");
+    // sets the color of the button
+    blogin.setForeground(Color.WHITE);
+    blogin.setBackground(Color.BLACK);
+    // sets the font for the button
+    blogin.setFont(new Font("Tahoma", Font.BOLD, 18));
+    // sets the Bounds for the button
+    blogin.setBounds(new Rectangle(550, 578, 350, 65));
+    // adds everything the the JFrame
+    getContentPane().add(userNameLabel);
+    getContentPane().add(passwordLabel);
+    getContentPane().add(blogin);
+    // actionlogin() is used to check for the correct username and password
+    actionlogin();
+    // conects to the SQLite database
+    connection = sqliteConnection.dbConnector();
+  }
+
+  // Return the test entered in the Username feild
+  public static String returnUsername() {
+    String userName = userNameLabel.getText();
+
+    return userName;
+  }
+
+  // The actionlogin method
+  public void actionlogin() {
+    // The Action interface provides a useful extension to the ActionListener
+    // interface in cases where the same functionality may be accessed by
+    // several controls.
+    Action action = new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        try {
+          // the String query is used to hold the username and password
+          String query = "select * from UsernameInfo where username = ? and password = ?";
+          // A SQL statement is precompiled and stored in a PreparedStatement
+          // object. This object can then be used to efficiently execute this
+          // statement multiple times.
+          PreparedStatement pst = connection.prepareStatement(query);
+          pst.setString(1, userNameLabel.getText());
+          pst.setString(2, passwordLabel.getText());
+          // A ResultSet object maintains a cursor pointing to its current row
+          // of data. Initially the cursor is positioned before the first row.
+          // The next method moves the cursor to the next row
+          ResultSet rs = pst.executeQuery();
+          int count = 0;
+          while (rs.next()) {
+
+            count++;
+
+          }
+          // Opens the Dashboard if the Login is correct
+          if (count == 1) {
+            mainDashboard regFace = new mainDashboard();
+            // regFace.setVisible(true);
+            dispose();
+            // If user and pass are incorrect
+          } else if (count == 2) {
+            JOptionPane.showMessageDialog(null,
+                "Duplicate Username and Password");
+            // If user or pass is incorrect
+          } else {
+            JOptionPane.showMessageDialog(null,
+                "Username and/or Password is not correct!");
+          }
+
+          rs.close();
+          pst.close();
+        } catch (Exception event) {
+          JOptionPane.showMessageDialog(null, event);
+        }
+      }
+    };
+    // This whole thing is identical to the previous this is triggered when
+    // someone has pressed the enter key in the password textField
+    passwordLabel.addActionListener(action);
+    blogin.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent ae) {
+        try {
+          String query = "select * from UsernameInfo where username = ? and password = ?";
+          PreparedStatement pst = connection.prepareStatement(query);
+          pst.setString(1, userNameLabel.getText());
+          pst.setString(2, passwordLabel.getText());
+
+          ResultSet rs = pst.executeQuery();
+          int count = 0;
+          while (rs.next()) {
+
+            count++;
+
+          }
+          if (count == 1) {
+            mainDashboard regFace = new mainDashboard();
+            // regFace.setVisible(true);
+            dispose();
+          } else if (count == 2) {
+            JOptionPane.showMessageDialog(null,
+                "Duplicate Username and Password");
+          } else {
+            JOptionPane.showMessageDialog(null,
+                "Username and/or Password is not correct!");
+          }
+
+          rs.close();
+          pst.close();
+        } catch (Exception e) {
+          JOptionPane.showMessageDialog(null, e);
+        }
+      }
+    });
+
+  }
 
 }
